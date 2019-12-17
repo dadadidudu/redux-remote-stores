@@ -25,7 +25,6 @@
   "dependencies": {
     "redux": "^3.7.2",
     "redux-saga": "^0.16.0",
-    "redux-websocket-bridge": "0.1.0-1",
     "ws": "^4.0.0"
   },
   "devDependencies": {}

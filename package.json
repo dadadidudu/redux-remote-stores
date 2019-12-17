@@ -1,6 +1,6 @@
 {
   "name": "redux-remote-stores",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Easily synchronise actions between remote Redux stores",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -11,10 +11,12 @@
     "email": "da.heger@hotmail.com",
     "name": "Daniel Heger"
   },
-  "contributors": [{
-    "email": "compulim@hotmail.com",
-    "name": "William Wong"
-  }],
+  "contributors": [
+    {
+      "email": "compulim@hotmail.com",
+      "name": "William Wong"
+    }
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

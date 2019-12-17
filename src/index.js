@@ -18,20 +18,31 @@ export function open() {
   return { type: OPEN };
 }
 
-let webSockets : WebSocket[] = [];
+let webSockets = [];
+let storeRef;
 
-export function addClientAsListener(clientWS) {
-  webSockets.push(clientWS);
-  initWebSocket(clientWS); // TODO hier fehlt der Store
+export function addConnectionToBridge(websocketOrUrl) {
+  let websocket;
+  if (typeof websocketOrUrl === "string") {
+    websocket = new WebSocket(websocketOrUrl);
+  }
+  else
+    websocket = websocketOrUrl;
+  initWebSocket(websocket, storeRef);
+  webSockets.push(websocket);
 }
 
-export function removeClients() {
+export function removeConnectionFromBridge(websocket) {
+  let wsIndex = webSockets.findIndex(ws => ws === websocket);
+  if (wsIndex !== -1) {
+    webSockets[wsIndex].close();
+    webSockets = webSockets.splice(wsIndex, 1);
+  }
+}
+
+export function removeAllConnectionsFromBridge() {
   webSockets.forEach(ws => ws.close());
   webSockets = [];
-}
-
-export function removeClient(clientWS) {
-  webSockets.filter(ws => ws.url === clientWS.url).forEach(ws => ws.close());
 }
 
 const DEFAULT_OPTIONS = {
@@ -62,7 +73,7 @@ function arrayify(obj) {
   return obj ? Array.isArray(obj) ? obj : [obj] : [];
 }
 
-export default function createWebSocketMiddleware(urlOrFactory, options = DEFAULT_OPTIONS) {
+export default function createWebSocketMiddleware(options = DEFAULT_OPTIONS) {
   options = { ...DEFAULT_OPTIONS, ...options };
   options.binaryType = options.binaryType.toLowerCase();
   options.unfold = options.unfold && (typeof options.unfold === 'function' ? options.unfold : DEFAULT_OPTIONS.unfold);
@@ -70,18 +81,7 @@ export default function createWebSocketMiddleware(urlOrFactory, options = DEFAUL
   const { namespace } = options;
 
   return store => {
-
-    let webSocket;
-    if (typeof urlOrFactory === 'function') {
-      webSocket = urlOrFactory();
-    } else {
-      webSocket = new WebSocket(urlOrFactory);
-    }
-    webSockets.push(webSocket);
-
-    webSockets.forEach(webSocket => {
-      initWebSocket(webSocket, store);
-    });
+    storeRef = store;
 
     return next => action => {
       if (action.type === `${ namespace }${ SEND }`) {

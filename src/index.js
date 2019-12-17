@@ -20,6 +20,7 @@ export function open() {
 
 let webSockets = [];
 let storeRef;
+let options;
 
 export function addConnectionToBridge(websocketOrUrl) {
   let websocket;
@@ -35,7 +36,9 @@ export function addConnectionToBridge(websocketOrUrl) {
 export function removeConnectionFromBridge(websocket) {
   let wsIndex = webSockets.findIndex(ws => ws === websocket);
   if (wsIndex !== -1) {
-    webSockets[wsIndex].close();
+    if (websocket.readyState !== WebSocket.CLOSING ||
+        websocket.readyState !== WebSocket.CLOSED)
+      webSockets[wsIndex].close();
     webSockets = webSockets.splice(wsIndex, 1);
   }
 }
@@ -73,10 +76,10 @@ function arrayify(obj) {
   return obj ? Array.isArray(obj) ? obj : [obj] : [];
 }
 
-export default function createWebSocketMiddleware(options = DEFAULT_OPTIONS) {
-  options = { ...DEFAULT_OPTIONS, ...options };
-  options.binaryType = options.binaryType.toLowerCase();
-  options.unfold = options.unfold && (typeof options.unfold === 'function' ? options.unfold : DEFAULT_OPTIONS.unfold);
+export default function createWebSocketMiddleware(customOptions = DEFAULT_OPTIONS) {
+  options = { ...DEFAULT_OPTIONS, ...customOptions };
+  options.binaryType = customOptions.binaryType.toLowerCase();
+  options.unfold = customOptions.unfold && (typeof customOptions.unfold === 'function' ? customOptions.unfold : DEFAULT_OPTIONS.unfold);
 
   const { namespace } = options;
 

@@ -84,13 +84,11 @@ export default function createWebSocketMiddleware(customOptions = DEFAULT_OPTION
   options.binaryType = customOptions.binaryType.toLowerCase();
   options.unfold = customOptions.unfold && (typeof customOptions.unfold === 'function' ? customOptions.unfold : DEFAULT_OPTIONS.unfold);
 
-  const { namespace } = options;
-
   return store => {
     storeRef = store;
 
     return next => action => {
-      if (action.type === `${ namespace }${ SEND }`) {
+      if (action.type === `${ options.namespace }${ SEND }`) {
         webSockets.forEach(webSocket => webSocket.send(action.payload));
       } else {
         webSockets.forEach(webSocket => {

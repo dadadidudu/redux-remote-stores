@@ -1,28 +1,34 @@
 {
-  "name": "redux-websocket-bridge",
-  "version": "0.3.0-0",
-  "description": "WebSocket messages to Redux action bridge",
+  "name": "redux-remote-stores",
+  "version": "0.4",
+  "description": "Easily synchronise actions between remote Redux stores",
   "main": "lib/index.js",
   "module": "lib/index.js",
   "files": [
     "lib/*"
   ],
   "author": {
+    "email": "da.heger@hotmail.com",
+    "name": "Daniel Heger"
+  },
+  "contributors": [{
     "email": "compulim@hotmail.com",
     "name": "William Wong"
-  },
+  }],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/compulim/redux-websocket-bridge.git"
+    "url": "https://github.com/dadadidudu/redux-websocket-bridge.git"
   },
   "keywords": [
-    "bridge",
     "redux",
-    "websocket"
+    "websocket",
+    "bridge",
+    "server",
+    "synchronization"
   ],
   "bugs": {
-    "url": "https://github.com/compulim/redux-websocket-bridge/issues"
+    "url": "https://github.com/dadadidudu/redux-websocket-bridge/issues"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

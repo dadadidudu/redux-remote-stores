@@ -24,22 +24,25 @@ let options;
 
 export function addConnectionToBridge(websocketOrUrl) {
   let websocket;
-  if (typeof websocketOrUrl === "string") {
+
+  if (typeof websocketOrUrl === "string")
     websocket = new WebSocket(websocketOrUrl);
-  }
   else
     websocket = websocketOrUrl;
+
   initWebSocket(websocket, storeRef);
   webSockets.push(websocket);
 }
 
 export function removeConnectionFromBridge(websocket) {
+
   let wsIndex = webSockets.findIndex(ws => ws === websocket);
-  if (wsIndex !== -1) {
-    if (websocket.readyState !== WebSocket.CLOSING ||
-        websocket.readyState !== WebSocket.CLOSED)
+
+  if (wsIndex > -1) {
+    if (websocket.readyState !== websocket.CLOSING ||
+        websocket.readyState !== websocket.CLOSED)
       webSockets[wsIndex].close();
-    webSockets = webSockets.splice(wsIndex, 1);
+    webSockets.splice(wsIndex, 1);
   }
 }
 
@@ -120,8 +123,8 @@ export function trimUndefined(map) {
 }
 
 function initWebSocket(webSocket, store) {
-  webSocket.onopen = () => store.dispatch({ type: `${namespace}${OPEN}`, meta: { webSocket } });
-  webSocket.onclose = () => store.dispatch({ type: `${namespace}${CLOSE}`, meta: { webSocket } });
+  webSocket.onopen = () => store.dispatch({ type: `${options.namespace}${OPEN}`, meta: { webSocket } });
+  webSocket.onclose = () => store.dispatch({ type: `${options.namespace}${CLOSE}`, meta: { webSocket } });
   webSocket.onmessage = event => {
     let getPayload;
 
@@ -148,7 +151,7 @@ function initWebSocket(webSocket, store) {
       }
 
       store.dispatch({
-        type: `${namespace}${MESSAGE}`,
+        type: `${options.namespace}${MESSAGE}`,
         meta: { webSocket },
         payload
       });

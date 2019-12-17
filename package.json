@@ -18,7 +18,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dadadidudu/redux-websocket-bridge.git"
+    "url": "https://github.com/dadadidudu/redux-remote-stores.git"
   },
   "keywords": [
     "redux",
@@ -28,7 +28,7 @@
     "synchronization"
   ],
   "bugs": {
-    "url": "https://github.com/dadadidudu/redux-websocket-bridge/issues"
+    "url": "https://github.com/dadadidudu/redux-remote-stores/issues"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

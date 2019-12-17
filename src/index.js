@@ -30,6 +30,10 @@ export function removeClients() {
   webSockets = [];
 }
 
+export function removeClient(clientWS) {
+  webSockets.filter(ws => ws.url === clientWS.url).forEach(ws => ws.close());
+}
+
 const DEFAULT_OPTIONS = {
   binaryType: 'arraybuffer',
   fold      : (action, webSocket) => {

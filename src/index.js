@@ -18,6 +18,18 @@ export function open() {
   return { type: OPEN };
 }
 
+let webSockets : WebSocket[] = [];
+
+export function addClientAsListener(clientWS) {
+  webSockets.push(clientWS);
+  initWebSocket(clientWS); // TODO hier fehlt der Store
+}
+
+export function removeClients() {
+  webSockets.forEach(ws => ws.close());
+  webSockets = [];
+}
+
 const DEFAULT_OPTIONS = {
   binaryType: 'arraybuffer',
   fold      : (action, webSocket) => {
@@ -54,56 +66,27 @@ export default function createWebSocketMiddleware(urlOrFactory, options = DEFAUL
   const { namespace } = options;
 
   return store => {
-    let webSocket;
 
+    let webSocket;
     if (typeof urlOrFactory === 'function') {
       webSocket = urlOrFactory();
     } else {
       webSocket = new WebSocket(urlOrFactory);
     }
+    webSockets.push(webSocket);
 
-    webSocket.onopen = () => store.dispatch({ type: `${ namespace }${ OPEN }`, meta: { webSocket } });
-    webSocket.onclose = () => store.dispatch({ type: `${ namespace }${ CLOSE }`, meta: { webSocket } });
-    webSocket.onmessage = event => {
-      let getPayload;
-
-      if (typeof Blob !== 'undefined' && options.binaryType === 'arraybuffer' && event.data instanceof Blob) {
-        getPayload = blobToArrayBuffer(event.data);
-      } else if (typeof ArrayBuffer !== 'undefined' && options.binaryType === 'blob' && event.data instanceof ArrayBuffer) {
-        getPayload = new Blob([event.data]);
-      } else {
-        // We make this a Promise because we might want to keep the sequence of dispatch, @@websocket/MESSAGE first, then unfold later.
-        getPayload = Promise.resolve(event.data);
-      }
-
-      return getPayload.then(payload => {
-        if (options.unfold) {
-          const action = options.unfold(payload, webSocket, payload);
-
-          if (action) {
-            if (!isFSA(action)) {
-              throw new Error('Unfolded action is not a Flux Standard Action compliant');
-            }
-
-            return action && store.dispatch(action);
-          }
-        }
-
-        store.dispatch({
-          type: `${ namespace }${ MESSAGE }`,
-          meta: { webSocket },
-          payload
-        });
-      });
-    }
+    webSockets.forEach(webSocket => {
+      initWebSocket(webSocket, store);
+    });
 
     return next => action => {
       if (action.type === `${ namespace }${ SEND }`) {
-        webSocket.send(action.payload);
+        webSockets.forEach(webSocket => webSocket.send(action.payload));
       } else {
-        const payload = options.fold(action, webSocket);
-
-        payload && webSocket.send(payload);
+        webSockets.forEach(webSocket => {
+          const payload = options.fold(action, webSocket);
+          payload && webSocket.send(payload);
+        })
       }
 
       return next(action);
@@ -127,4 +110,41 @@ export function trimUndefined(map) {
 
     return nextMap;
   }, {});
+}
+
+function initWebSocket(webSocket, store) {
+  webSocket.onopen = () => store.dispatch({ type: `${namespace}${OPEN}`, meta: { webSocket } });
+  webSocket.onclose = () => store.dispatch({ type: `${namespace}${CLOSE}`, meta: { webSocket } });
+  webSocket.onmessage = event => {
+    let getPayload;
+
+    if (typeof Blob !== 'undefined' && options.binaryType === 'arraybuffer' && event.data instanceof Blob) {
+      getPayload = blobToArrayBuffer(event.data);
+    } else if (typeof ArrayBuffer !== 'undefined' && options.binaryType === 'blob' && event.data instanceof ArrayBuffer) {
+      getPayload = new Blob([event.data]);
+    } else {
+      // We make this a Promise because we might want to keep the sequence of dispatch, @@websocket/MESSAGE first, then unfold later.
+      getPayload = Promise.resolve(event.data);
+    }
+
+    return getPayload.then(payload => {
+      if (options.unfold) {
+        const action = options.unfold(payload, webSocket, payload);
+
+        if (action) {
+          if (!isFSA(action)) {
+            throw new Error('Unfolded action is not a Flux Standard Action compliant');
+          }
+
+          return action && store.dispatch(action);
+        }
+      }
+
+      store.dispatch({
+        type: `${namespace}${MESSAGE}`,
+        meta: { webSocket },
+        payload
+      });
+    });
+  }
 }

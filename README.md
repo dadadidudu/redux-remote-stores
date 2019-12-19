@@ -8,7 +8,7 @@ It is based on the package [redux-websocket-bridge](https://github.com/compulim/
 
 ## Usage
 
-* Add as middleware to your store
+* Add as middleware to your store with *createWebSocketMiddleware()*
 * Create a Websocket connection OR a string with the WebSocket URL you want to connect to.
 * Call *addConnectionToStore(WebSocketOrUrl)* with the Websocket or URL as argument
 * Call *removeConnectionFromStore(WebSocket)* when you're finished. The connection is automatically closed.

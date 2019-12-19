@@ -22,7 +22,7 @@ let webSockets = [];
 let storeRef;
 let options;
 
-export function addConnectionToBridge(websocketOrUrl) {
+export function addConnectionToStore(websocketOrUrl) {
   let websocket;
 
   if (typeof websocketOrUrl === "string")
@@ -30,11 +30,14 @@ export function addConnectionToBridge(websocketOrUrl) {
   else
     websocket = websocketOrUrl;
 
+  if (storeRef === undefined)
+    throw new Error("Redux store must be set up before adding connections.");
+
   initWebSocket(websocket, storeRef);
   webSockets.push(websocket);
 }
 
-export function removeConnectionFromBridge(websocket) {
+export function removeConnectionFromStore(websocket) {
 
   let wsIndex = webSockets.findIndex(ws => ws === websocket);
 
@@ -46,7 +49,7 @@ export function removeConnectionFromBridge(websocket) {
   }
 }
 
-export function removeAllConnectionsFromBridge() {
+export function removeAllConnectionsFromStore() {
   webSockets.forEach(ws => ws.close());
   webSockets = [];
 }
@@ -79,7 +82,7 @@ function arrayify(obj) {
   return obj ? Array.isArray(obj) ? obj : [obj] : [];
 }
 
-export default function createWebSocketMiddleware(customOptions = DEFAULT_OPTIONS) {
+export function createWebSocketMiddleware(customOptions = DEFAULT_OPTIONS) {
   options = { ...DEFAULT_OPTIONS, ...customOptions };
   options.binaryType = customOptions.binaryType.toLowerCase();
   options.unfold = customOptions.unfold && (typeof customOptions.unfold === 'function' ? customOptions.unfold : DEFAULT_OPTIONS.unfold);

@@ -129,9 +129,9 @@ function initWebSocket(webSocket, store) {
   webSocket.onmessage = event => {
     let getPayload;
 
-    if (typeof Blob !== 'undefined' && options.binaryType === 'arraybuffer' && event.data instanceof Blob) {
+    if (typeof Blob !== 'undefined' && options.binaryType === 'blob' && event.data instanceof Blob) {
       getPayload = blobToArrayBuffer(event.data);
-    } else if (typeof ArrayBuffer !== 'undefined' && options.binaryType === 'blob' && event.data instanceof ArrayBuffer) {
+    } else if (typeof ArrayBuffer !== 'undefined' && options.binaryType === 'arraybuffer' && event.data instanceof ArrayBuffer) {
       getPayload = new Blob([event.data]);
     } else {
       // We make this a Promise because we might want to keep the sequence of dispatch, @@websocket/MESSAGE first, then unfold later.

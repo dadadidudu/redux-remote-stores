@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.0-0]
+
+* Fixed a mistake distinguishing between Blob and ArrayBuffer
+* Updated documentation
+
 ## [0.5.0-0]
 
 * Changed exports

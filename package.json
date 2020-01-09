@@ -1,6 +1,6 @@
 {
   "name": "redux-remote-stores",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Easily synchronise actions between remote Redux stores",
   "main": "lib/index.js",
   "module": "lib/index.js",
